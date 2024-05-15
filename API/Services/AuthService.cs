@@ -7,7 +7,7 @@ using API.Helpers;
 using API.Repositories;
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Core.Services
+namespace API.Services
 {
     public class AuthService(GymClubContext context, IConfiguration configuration) : IAuthService
     {
@@ -43,7 +43,7 @@ namespace API.Core.Services
             }
 
             var accessToken = _tokenHelper.GenerateAccessToken(user);
-            
+
             if (user.RefreshToken == null || user.RefreshTokenCreatedAt < DateTime.UtcNow.AddMonths(1))
             {
                 user.RefreshToken = _tokenHelper.GenerateRefreshToken();
