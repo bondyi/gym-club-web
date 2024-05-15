@@ -1,0 +1,27 @@
+version: '3.4'
+
+volumes:
+  gym-club-data:
+
+services:
+  postgres:
+    container_name: Database
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gym_club
+    ports:
+      - 5432:5432
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - gym-club-data:/var/lib/postgresql/data
+
+  api:
+    container_name: API
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    depends_on:
+      - postgres
