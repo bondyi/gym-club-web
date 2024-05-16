@@ -18,7 +18,9 @@ namespace API.Services
         public async Task RegisterAsync(RegisterDto dto)
         {
             if (!Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) &&
-                !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
+                !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD) &&
+                !Regex.IsMatch(dto.Name, RegexPatterns.NAME) &&
+                !Regex.IsMatch(dto.Surname, RegexPatterns.SURNAME))
             {
                 throw new Exception("Invalid data.");
             }
@@ -30,9 +32,13 @@ namespace API.Services
 
             var newUser = new User()
             {
-                UserRole = "client",
+                UserRole = dto.UserRole,
                 PhoneNumber = dto.PhoneNumber,
-                HashPassword = _passwordHasher.HashPassword(dto, dto.Password)
+                HashPassword = _passwordHasher.HashPassword(dto, dto.Password),
+                Name = dto.Name,
+                Surname = dto.Surname,
+                BirthDate = dto.BirthDate,
+                Gender = dto.Gender
             };
 
             await _repository.Post(newUser);
