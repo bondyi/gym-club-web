@@ -55,27 +55,6 @@ namespace API.Controllers
             return Ok(new Response("Change Successful."));
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<IActionResult> PostUser(User user)
-        {
-            try
-            {
-                await _repository.Post(user);
-            }
-            catch (NullReferenceException)
-            {
-                return NotFound(new Response("Not found."));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-
-            return Ok(new Response("Create successful."));
-        }
-
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
