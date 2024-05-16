@@ -4,7 +4,6 @@ using API.Core.Models.Entities;
 using API.Core.Models;
 using API.Repositories;
 using API.Core.Models.Responses;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
