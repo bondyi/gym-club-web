@@ -17,10 +17,10 @@ namespace API.Services
 
         public async Task RegisterAsync(RegisterDto dto)
         {
-            if (Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) ||
-                Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
+            if (!Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) &&
+                !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
             {
-                throw new Exception("Wrong format.");
+                throw new Exception("Invalid data.");
             }
 
             if (await _repository.GetUserByPhoneNumber(dto.PhoneNumber) != null)
@@ -30,7 +30,7 @@ namespace API.Services
 
             var newUser = new User()
             {
-                UserRole = dto.UserRole,
+                UserRole = "client",
                 PhoneNumber = dto.PhoneNumber,
                 HashPassword = _passwordHasher.HashPassword(dto, dto.Password)
             };
@@ -40,10 +40,10 @@ namespace API.Services
 
         public async Task<TokenPairDto> LoginAsync(LoginDto dto)
         {
-            if (Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) ||
-                Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
+            if (!Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) &&
+                !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
             {
-                throw new Exception("Wrong format.");
+                throw new Exception("Invalid data.");
             }
 
             var user = await _repository.GetUserByPhoneNumber(dto.PhoneNumber) ?? throw new NullReferenceException();
@@ -55,7 +55,7 @@ namespace API.Services
 
             var accessToken = _tokenHelper.GenerateAccessToken(user);
 
-            if (user.RefreshToken == null || user.RefreshTokenCreatedAt.Value.AddMonths(1) > DateTime.UtcNow)
+            if (user.RefreshToken == null || user.RefreshTokenCreatedAt.Value.AddMonths(1) < DateTime.UtcNow)
             {
                 user.RefreshToken = _tokenHelper.GenerateRefreshToken();
                 user.RefreshTokenCreatedAt = DateTime.UtcNow;
@@ -75,7 +75,7 @@ namespace API.Services
                 throw new Exception("Invalid refresh token.");
             }
 
-            if (user.RefreshTokenCreatedAt.Value.AddMonths(1) > DateTime.UtcNow)
+            if (user.RefreshTokenCreatedAt.Value.AddMonths(1) < DateTime.UtcNow)
             {
                 throw new Exception("The token has expired.");
             }
