@@ -2,10 +2,10 @@
 using API.Core.Interfaces;
 using API.Core.Models;
 using API.Core.Models.Entities;
-using API.Core.Models.Responses;
 using API.Helpers;
 using API.Repositories;
 using Microsoft.AspNetCore.Identity;
+using System.Text.RegularExpressions;
 
 namespace API.Services
 {
@@ -17,9 +17,16 @@ namespace API.Services
 
         public async Task RegisterAsync(RegisterDto dto)
         {
-            var user = await _repository.GetUserByPhoneNumber(dto.PhoneNumber);
+            if (Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) ||
+                Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
+            {
+                throw new Exception("Wrong format.");
+            }
 
-            if (user != null) throw new Exception("User already exists.");
+            if (await _repository.GetUserByPhoneNumber(dto.PhoneNumber) != null)
+            {
+                throw new Exception("User already exists.");
+            }
 
             var newUser = new User()
             {
@@ -31,23 +38,27 @@ namespace API.Services
             await _repository.Post(newUser);
         }
 
-        public async Task<TokenPairDto> LoginAsync(LoginDto request)
+        public async Task<TokenPairDto> LoginAsync(LoginDto dto)
         {
-            var user = await _repository.GetUserByPhoneNumber(request.PhoneNumber);
+            if (Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) ||
+                Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD))
+            {
+                throw new Exception("Wrong format.");
+            }
 
-            if (user == null) throw new NullReferenceException();
+            var user = await _repository.GetUserByPhoneNumber(dto.PhoneNumber) ?? throw new NullReferenceException();
 
-            if (_passwordHasher.VerifyHashedPassword(request, user.HashPassword, request.Password) == PasswordVerificationResult.Failed)
+            if (_passwordHasher.VerifyHashedPassword(dto, user.HashPassword, dto.Password) == PasswordVerificationResult.Failed)
             {
                 throw new Exception("Invalid credentials.");
             }
 
             var accessToken = _tokenHelper.GenerateAccessToken(user);
 
-            if (user.RefreshToken == null || user.RefreshTokenCreatedAt < DateTime.UtcNow.AddMonths(1))
+            if (user.RefreshToken == null || user.RefreshTokenCreatedAt.Value.AddMonths(1) > DateTime.UtcNow)
             {
                 user.RefreshToken = _tokenHelper.GenerateRefreshToken();
-                user.RefreshTokenCreatedAt = DateTime.UtcNow.AddMonths(1);
+                user.RefreshTokenCreatedAt = DateTime.UtcNow;
 
                 await _repository.Put(user, user.UserId);
             }
@@ -64,7 +75,7 @@ namespace API.Services
                 throw new Exception("Invalid refresh token.");
             }
 
-            if (user.RefreshTokenCreatedAt >= DateTime.UtcNow.AddMonths(1))
+            if (user.RefreshTokenCreatedAt.Value.AddMonths(1) > DateTime.UtcNow)
             {
                 throw new Exception("The token has expired.");
             }

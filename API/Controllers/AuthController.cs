@@ -1,7 +1,6 @@
 ﻿using API.Core.Dto;
 using API.Core.Interfaces;
 using API.Core.Models.Responses;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -21,7 +20,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                return Ok(new Response(e.Message));
+                return BadRequest(new Response(e.Message));
             }
 
             return Ok(new Response("Registration successful."));
@@ -49,7 +48,7 @@ namespace API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshTokensAsync(string refreshToken)
+        public async Task<IActionResult> RefreshTokens(string refreshToken)
         {
             TokenPairDto tokens;
             try
@@ -58,7 +57,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                return Ok(new Response(e.Message));
+                return BadRequest(new Response(e.Message));
             }
 
             return Ok(new AuthResponse("Refresh successful", tokens.AccessToken, tokens.RefreshToken));

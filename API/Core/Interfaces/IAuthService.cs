@@ -1,5 +1,4 @@
 ﻿using API.Core.Dto;
-using API.Core.Models.Responses;
 
 namespace API.Core.Interfaces
 {
