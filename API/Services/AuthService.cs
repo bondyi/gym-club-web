@@ -20,7 +20,8 @@ namespace API.Services
             if (!Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) &&
                 !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD) &&
                 !Regex.IsMatch(dto.Name, RegexPatterns.NAME) &&
-                !Regex.IsMatch(dto.Surname, RegexPatterns.SURNAME))
+                !Regex.IsMatch(dto.Surname, RegexPatterns.SURNAME) &&
+                !Regex.IsMatch(dto.BirthDate.ToString(), RegexPatterns.DATE))
             {
                 throw new Exception("Invalid data.");
             }
