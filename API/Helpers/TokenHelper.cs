@@ -17,6 +17,7 @@ namespace API.Helpers
             var claims = new List<Claim>
             {
                 new(ClaimTypes.MobilePhone, user.PhoneNumber),
+                new(ClaimTypes.Role, user.UserRole)
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
