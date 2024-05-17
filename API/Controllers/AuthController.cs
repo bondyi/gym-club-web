@@ -1,6 +1,5 @@
 ﻿using API.Core.Dto;
 using API.Core.Interfaces;
-using API.Core.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -20,10 +19,10 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new Response(e.Message));
+                return BadRequest(e.Message);
             }
 
-            return Ok(new Response("Registration successful."));
+            return Ok();
         }
 
         [HttpPost("login")]
@@ -37,30 +36,31 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound(new Response("Not found."));
+                return NotFound();
             }
             catch (Exception e)
             {
-                return BadRequest(new Response(e.Message));
+                return BadRequest(e.Message);
             }
 
-            return Ok(new AuthResponse("Login successful", tokens.AccessToken, tokens.RefreshToken));
+            return Ok(new {tokens.AccessToken, tokens.RefreshToken});
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshTokens(string refreshToken)
         {
             TokenPairDto tokens;
+
             try
             {
                 tokens = await _authService.RefreshTokensAsync(refreshToken);
             }
             catch (Exception e)
             {
-                return BadRequest(new Response(e.Message));
+                return BadRequest(e.Message);
             }
 
-            return Ok(new AuthResponse("Refresh successful", tokens.AccessToken, tokens.RefreshToken));
+            return Ok(new { tokens.AccessToken, tokens.RefreshToken });
         }
     }
 }

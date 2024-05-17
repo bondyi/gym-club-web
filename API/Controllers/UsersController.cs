@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using API.Core.Models.Entities;
 using API.Core.Models;
 using API.Repositories;
-using API.Core.Models.Responses;
 
 namespace API.Controllers
 {
@@ -27,7 +26,7 @@ namespace API.Controllers
         {
             var user = await _repository.Get(id);
 
-            if (user == null) return NotFound(new Response("Not found."));
+            if (user == null) return NotFound();
 
             return Ok(user);
         }
@@ -39,7 +38,7 @@ namespace API.Controllers
         {
             if (id != user.UserId)
             {
-                return BadRequest(new Response("Invalid ID."));
+                return BadRequest("Invalid ID.");
             }
 
             try
@@ -48,10 +47,10 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound(new Response("Not found."));
+                return NotFound();
             }
 
-            return Ok(new Response("Change Successful."));
+            return Ok(user);
         }
 
         // DELETE: api/Users/5
@@ -64,10 +63,10 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound(new Response("Not found."));
+                return NotFound();
             }
 
-            return Ok(new Response("Delete successful."));
+            return Ok();
         }
     }
 }
