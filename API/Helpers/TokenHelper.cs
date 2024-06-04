@@ -16,7 +16,7 @@ namespace API.Helpers
         {
             var claims = new List<Claim>
             {
-                new(ClaimTypes.MobilePhone, user.PhoneNumber),
+                new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new(ClaimTypes.Role, user.UserRole)
             };
 
