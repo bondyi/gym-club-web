@@ -17,6 +17,10 @@ namespace API.Controllers
             {
                 await _authService.RegisterAsync(request);
             }
+            catch (NullReferenceException e)
+            {
+                return NotFound("User not found");
+            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
@@ -36,7 +40,7 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             catch (Exception e)
             {

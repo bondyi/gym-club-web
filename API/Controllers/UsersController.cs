@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             var user = await _repository.Get(id);
 
-            if (user == null) return NotFound();
+            if (user == null) return NotFound("User not found.");
 
             return Ok(user);
         }
@@ -47,7 +47,7 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
 
             return Ok(user);
@@ -63,7 +63,7 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
 
             return Ok();
