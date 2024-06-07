@@ -70,7 +70,11 @@ namespace API.Services
                 await _repository.Put(user, user.UserId);
             }
 
-            return new TokenPairDto(accessToken, user.RefreshToken);
+            return new TokenPairDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = user.RefreshToken
+            };
         }
 
         public async Task<TokenPairDto> RefreshTokensAsync(string refreshToken)
@@ -95,7 +99,11 @@ namespace API.Services
 
             await _repository.Put(user, user.UserId);
 
-            return new TokenPairDto(accessToken, refreshToken);
+            return new TokenPairDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = user.RefreshToken
+            };
         }
     }
 }

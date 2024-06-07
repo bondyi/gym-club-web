@@ -17,7 +17,7 @@ namespace API.Controllers
             {
                 await _authService.RegisterAsync(request);
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
                 return NotFound("User not found");
             }
@@ -32,11 +32,11 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto request)
         {
-            TokenPairDto tokens;
+            TokenPairDto tokenPair;
 
             try
             {
-                tokens = await _authService.LoginAsync(request);
+                tokenPair = await _authService.LoginAsync(request);
             }
             catch (NullReferenceException)
             {
@@ -47,24 +47,24 @@ namespace API.Controllers
                 return BadRequest(e.Message);
             }
 
-            return Ok(new {tokens.AccessToken, tokens.RefreshToken});
+            return Ok(tokenPair);
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshTokens(string refreshToken)
         {
-            TokenPairDto tokens;
+            TokenPairDto tokenPair;
 
             try
             {
-                tokens = await _authService.RefreshTokensAsync(refreshToken);
+                tokenPair = await _authService.RefreshTokensAsync(refreshToken);
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
 
-            return Ok(new { tokens.AccessToken, tokens.RefreshToken });
+            return Ok(tokenPair);
         }
     }
 }
