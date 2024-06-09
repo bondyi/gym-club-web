@@ -1,30 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using API.Core.Models.Entities;
-using API.Core.Models;
-using API.Repositories;
+using API.Core.Interfaces;
+using API.Core.Dto;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class UsersController(GymClubContext context) : ControllerBase
+    public class UsersController(IService<UserDto> service) : ControllerBase
     {
-        private readonly UserRepository _repository = new(context);
+        private readonly IService<UserDto> _service = service;
 
         // GET: api/Users
         [HttpGet]
-        public async Task<IEnumerable<User>> GetUsers()
+        public async Task<IEnumerable<UserDto>> GetUsers()
         {
-            return await _repository.GetAll();
+            return await _service.GetAll();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _repository.Get(id);
+            var user = await _service.Get(id);
 
             if (user == null) return NotFound("User not found.");
 
@@ -34,7 +34,7 @@ namespace API.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserDto user)
         {
             if (id != user.UserId)
             {
@@ -43,7 +43,7 @@ namespace API.Controllers
 
             try
             {
-                await _repository.Put(user, id);
+                await _service.Put(id, user);
             }
             catch (NullReferenceException)
             {
@@ -59,7 +59,7 @@ namespace API.Controllers
         {
             try
             {
-                await _repository.Delete(id);
+                await _service.Delete(id);
             }
             catch (NullReferenceException)
             {

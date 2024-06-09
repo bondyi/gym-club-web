@@ -1,27 +1,28 @@
-﻿using API.Core.Interfaces;
-using API.Core.Models;
+﻿using API.Core.Models;
 using API.Core.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories
 {
-    public class UserRepository(GymClubContext context) : Repository<User>(context), IRepository<User>
+    public class UserRepository(GymClubContext context) : BaseRepository<User>(context)
     {
-        public async override Task<IEnumerable<User>> GetAll()
+        private readonly GymClubContext context = context;
+
+        public new async Task<IEnumerable<User>> GetAll()
         {
             return await context.Users.ToListAsync();
         }
 
-        public async Task<User> GetUserByPhoneNumber(string phoneNumber)
+        public async Task<User?> GetUserByPhoneNumber(string phoneNumber)
         {
-            var users = await GetAll();
-            var user = users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefault();
-            return user;
+            var users = await context.Users.ToListAsync();
+            return users.Where(u => u.PhoneNumber == phoneNumber).SingleOrDefault();
         }
 
-        public async Task<User> GetUserByRefreshToken(string refreshToken)
+        public async Task<User?> GetUserByRefreshToken(string refreshToken)
         {
-            return await context.Users.FirstAsync(e => e.RefreshToken == refreshToken);
+            var users = await context.Users.ToListAsync();
+            return users.Where(u => u.RefreshToken == refreshToken).SingleOrDefault();
         }
     }
 }

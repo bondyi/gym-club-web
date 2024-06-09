@@ -19,7 +19,7 @@ namespace API.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound("User not found");
+                return NotFound("User not found.");
             }
             catch (Exception e)
             {
@@ -51,13 +51,13 @@ namespace API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshTokens(string refreshToken)
+        public async Task<IActionResult> RefreshTokens(string token)
         {
             TokenPairDto tokenPair;
 
             try
             {
-                tokenPair = await _authService.RefreshTokensAsync(refreshToken);
+                tokenPair = await _authService.RefreshTokensAsync(token);
             }
             catch (Exception e)
             {

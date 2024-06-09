@@ -17,11 +17,12 @@ namespace API.Services
 
         public async Task RegisterAsync(RegisterDto dto)
         {
+
             if (!Regex.IsMatch(dto.PhoneNumber, RegexPatterns.PHONE_NUMBER) &&
                 !Regex.IsMatch(dto.Password, RegexPatterns.PASSWORD) &&
                 !Regex.IsMatch(dto.Name, RegexPatterns.NAME) &&
                 !Regex.IsMatch(dto.Surname, RegexPatterns.SURNAME) &&
-                !Regex.IsMatch(dto.BirthDate.ToString(), RegexPatterns.DATE))
+                !Regex.IsMatch(dto.BirthDate.ToString()!, RegexPatterns.DATE))
             {
                 throw new Exception("Invalid data.");
             }
@@ -62,29 +63,26 @@ namespace API.Services
 
             var accessToken = _tokenHelper.GenerateAccessToken(user);
 
-            if (user.RefreshToken == null || user.RefreshTokenCreatedAt.Value.AddMonths(1) < DateTime.UtcNow)
+            if (user.RefreshTokenCreatedAt == null || user.RefreshTokenCreatedAt.Value.AddMonths(1) < DateTime.UtcNow)
             {
                 user.RefreshToken = _tokenHelper.GenerateRefreshToken();
                 user.RefreshTokenCreatedAt = DateTime.UtcNow;
 
-                await _repository.Put(user, user.UserId);
+                await _repository.Put(user.UserId, user);
             }
 
             return new TokenPairDto
             {
                 AccessToken = accessToken,
-                RefreshToken = user.RefreshToken
+                RefreshToken = user.RefreshToken!
             };
         }
 
         public async Task<TokenPairDto> RefreshTokensAsync(string refreshToken)
         {
-            var user = await _repository.GetUserByRefreshToken(refreshToken);
+            var user = await _repository.GetUserByRefreshToken(refreshToken) ?? throw new NullReferenceException();
 
-            if (user.RefreshToken != refreshToken)
-            {
-                throw new Exception("Invalid refresh token.");
-            }
+            if (user.RefreshTokenCreatedAt == null) throw new NullReferenceException();
 
             if (user.RefreshTokenCreatedAt.Value.AddMonths(1) < DateTime.UtcNow)
             {
@@ -97,7 +95,7 @@ namespace API.Services
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenCreatedAt = DateTime.UtcNow;
 
-            await _repository.Put(user, user.UserId);
+            await _repository.Put(user.UserId, user);
 
             return new TokenPairDto
             {

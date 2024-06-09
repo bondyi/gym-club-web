@@ -20,6 +20,8 @@ namespace API.Helpers
                 new(ClaimTypes.Role, user.UserRole)
             };
 
+            if (_jwtSettings == null) throw new NullReferenceException("JWT configuration not found.");
+
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -41,7 +43,8 @@ namespace API.Helpers
 
         public string GenerateRefreshToken()
         {
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            var token =  Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            return token.Replace('+', 'z');
         }
     }
 }

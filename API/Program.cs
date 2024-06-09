@@ -1,3 +1,4 @@
+using API.Core.Dto;
 using API.Core.Interfaces;
 using API.Core.Models;
 using API.Core.Models.Entities;
@@ -24,6 +25,8 @@ builder.Services.AddDbContext<GymClubContext>(options =>
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
+    var key = builder.Configuration["JWT:Secret"] ?? throw new NullReferenceException("JWT Configuration not found.");
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -32,12 +35,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IService<UserDto>, UserService>();
 
 var app = builder.Build();
 
