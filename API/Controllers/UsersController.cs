@@ -24,9 +24,16 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _service.Get(id);
+            UserDto? user;
 
-            if (user == null) return NotFound("User not found.");
+            try
+            {
+                user = await _service.Get(id);
+            }
+            catch (NullReferenceException)
+            {
+                return NotFound("User not found.");
+            }
 
             return Ok(user);
         }
