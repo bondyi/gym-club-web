@@ -17,16 +17,12 @@ namespace API.Controllers
             {
                 await _authService.RegisterAsync(request);
             }
-            catch (NullReferenceException)
-            {
-                return NotFound("User not found.");
-            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
 
-            return Ok();
+            return Created();
         }
 
         [HttpPost("login")]

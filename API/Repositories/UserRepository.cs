@@ -16,13 +16,13 @@ namespace API.Repositories
         public async Task<User?> GetUserByPhoneNumber(string phoneNumber)
         {
             var users = await context.Users.ToListAsync();
-            return users.Where(u => u.PhoneNumber == phoneNumber).SingleOrDefault();
+            return users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefault();
         }
 
         public async Task<User?> GetUserByRefreshToken(string refreshToken)
         {
             var users = await context.Users.ToListAsync();
-            return users.Where(u => u.RefreshToken == refreshToken).SingleOrDefault();
+            return users.Where(u => u.RefreshToken == refreshToken).FirstOrDefault();
         }
     }
 }

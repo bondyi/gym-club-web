@@ -90,10 +90,12 @@ namespace API.Services
             }
 
             var accessToken = _tokenHelper.GenerateAccessToken(user);
-            var newRefreshToken = _tokenHelper.GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            user.RefreshTokenCreatedAt = DateTime.UtcNow;
+            
+            if (user.RefreshToken == null)
+            {
+                user.RefreshToken = _tokenHelper.GenerateRefreshToken();
+                user.RefreshTokenCreatedAt = DateTime.UtcNow;
+            }
 
             await _repository.Put(user.UserId, user);
 
